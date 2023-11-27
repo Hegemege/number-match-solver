@@ -4,7 +4,8 @@ import math
 
 from game_state import GameState
 
-MAX_SOLUTION_LENGTH = 100
+MAX_SOLUTION_LENGTH = 200
+MAX_STACK_SIZE = 100000
 
 
 def main():
@@ -62,8 +63,8 @@ def solve(input_data):
     states_searched = 0
 
     while True:
-        if states_searched > 50000:
-            print("50k searched, applying actions of highest found heuristic score")
+        if states_searched > MAX_STACK_SIZE:
+            print(str(MAX_STACK_SIZE) + " stack limit reached, applying actions of highest found heuristic score")
             break
         if len(search_stack) == 0 and len(state_history) > 0:
             print("Unable to find solution")
@@ -143,7 +144,12 @@ def solve(input_data):
         # Sort the search stack such that the latest action has the highest heuristic score
         search_stack.sort(key=lambda item: item[2])
 
-    print(shortest_solution)
+    print(original_state)
+    for action in shortest_solution:
+        print(action)
+        original_state.apply_action(action)
+        print(original_state)
+        print()
 
 
 if __name__ == "__main__":
