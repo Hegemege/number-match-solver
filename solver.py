@@ -1,23 +1,33 @@
 import time
 import functools
 import math
+import sys
 
 from game_state import GameState
 
 MAX_SOLUTION_LENGTH = 200
 MAX_STACK_SIZE = 100000
+FIND_SHORTEST = True
 
 
 def main():
     intro_print()
 
+    filename = None
+    # Get filename from command line
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+
     # Load game state from file
     # Or get it from user input
-    input_data=load_game_state("example.state")
-    #input_data = get_input()
+    if filename != None:
+        input_data=load_game_state(filename)
+    else:
+        input_data = get_input()
     
-    print("state:")
+    print("Initial state:")
     print(input_data)
+    print("Solving...")
 
     solve(input_data)
 
@@ -47,7 +57,8 @@ def solve(input_data):
 
     # Initialize the search stack
     search_stack.append((state, [], 0))
-    shortest_solution = [0 for i in range(10000)]
+    highest_heuristic_solution = []
+    shortest_solution = [0 for i in range(MAX_SOLUTION_LENGTH+1)]
 
     original_state = state.clone()
     highest_heuristic = -999
@@ -90,6 +101,7 @@ def solve(input_data):
                 "Searched",
                 states_searched,
                 flush=True,
+                sep=('\t')
             )
 
         if print_state_since > print_state_interval:
@@ -108,13 +120,23 @@ def solve(input_data):
         if len(current_history) > MAX_SOLUTION_LENGTH:
             continue
 
+        # End searches that are longer than the shortest solution
+        actions_needed = current_state.actions_needed_at_least()
+        if len(current_history) + actions_needed > len(shortest_solution):
+            continue
+
         if current_state.is_won():
             print("New solution")
             print("Length:", len(current_history))
             print("States searched:", states_searched)
             print("Stack size:", len(search_stack))
             print(flush=True)
-            break
+            if FIND_SHORTEST:
+                if len(current_history) < len(shortest_solution):
+                    shortest_solution = current_history
+                continue # Find shortest
+            else:
+                break
 
         current_actions = current_state.get_legal_actions()
 
@@ -133,7 +155,7 @@ def solve(input_data):
 
             if heuristic_score >= highest_heuristic:
                 highest_heuristic = heuristic_score
-                shortest_solution = current_history + [action]
+                highest_heuristic_solution = current_history + [action]
 
             new_history = list(current_history)
             new_history += [action]

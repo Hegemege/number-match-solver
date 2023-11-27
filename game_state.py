@@ -1,3 +1,5 @@
+import math
+
 COLUMNS = 9
 ACTION_MATCH = "Match"
 ACTION_REFRESH = "Refresh"
@@ -40,6 +42,16 @@ class GameState:
 
         return len(self.board) == 0
     
+    def actions_needed_at_least(self):
+        """
+            Returns the minimum number of actions needed to win the game.
+            This is the number of nonzero numbers on the board divided by two, rounded up.
+        """
+        nonzero_filter = lambda x: x != None and x > 0
+        
+        nonzero_numbers = [number for row in self.board for number in row if nonzero_filter(number)]
+        return math.ceil(len(nonzero_numbers) / 2)
+
     def clean_board(self):
         """
             Removes all rows that are full of zeroes
@@ -224,4 +236,4 @@ class GameState:
         return hash(self.hash_string())
 
     def __str__(self):
-        return "Board:\n" + "Refreshes:" + str(self.refreshes) + "\n" + "\n".join([str(row) for row in self.board])
+        return "Board:\n" + "Refreshes:" + str(self.refreshes) + "\n" + "\n".join(["".join(map(lambda x: str(x) if x != None and x > 0 else ".", row)) for row in self.board])
