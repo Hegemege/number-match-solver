@@ -10,6 +10,7 @@ Each level presents a vertically scrolling grid with 9 columns. The first 35 cel
 - The last unmatched number on a row, and the first unmatched number on the next row can match, even if they are not on the same column or diagonal.
 - The player can at any time add more numbers on the board by copying all existing unmatched numbers in order starting from the topleft corner going right, and adding them without any gaps to the end of the grid. The player can only do this a given number of times (5).
 - When all numbers on a row have been matched, the row is removed and the rows below it are moved up.
+- When the player has exhausted all legal moves and has ran out of times they can add more numbers to the grid, the game is lost.
 
 ## Usage
 
